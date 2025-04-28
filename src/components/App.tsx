@@ -7,7 +7,7 @@ import Main from "./Main";
 import Footer from "./Footer";
 import Register from "./Register";
 import Login from "./Login";
-import InfoTooltip from "./InfoTooltip";
+import InfoTooltip, { MessageData } from "./InfoTooltip";
 import ProtectedRoute from "./ProtectedRoute";
 import { checkAuth } from "../store/auth/actions";
 import { getIsAuth } from "../store/auth/selectors";
@@ -15,12 +15,13 @@ import ImagePopup from './ImagePopup';
 
 function App() {
   const dispatch = useDispatch();
-  const [tooltipStatus, setTooltipStatus] = React.useState();
-  const closeInfoTooltip = () => setTooltipStatus();
+  const [tooltipStatus, setTooltipStatus] = React.useState<MessageData|null>(null);
+  const closeInfoTooltip = () => setTooltipStatus(null);
   const isLoggedIn = useSelector(getIsAuth);
   const location = useLocation();
   const navigate = useNavigate();
   React.useEffect(() => {
+	// @ts-expect-error "sprint4"
     dispatch(checkAuth());
   }, [dispatch]);
 

@@ -1,12 +1,16 @@
 import React from "react";
-import PropTypes from "prop-types";
 import { Link, useLocation } from "react-router-dom";
-import { cardPropTypes } from "../utils/prop-types";
 import { useSelector, useDispatch } from "react-redux";
 import { getCurrentUser } from "../store/current-user/selectors";
 import { changeLikeCardStatus } from "../store/cards/actions";
+import { TCardData } from "../utils/types";
 
-function Card({ card, onDelete }) {
+type CardProps = {
+	card: TCardData;
+	onDelete: (card: TCardData) => void;
+}
+
+function Card({ card, onDelete }: CardProps): React.JSX.Element {
   const location = useLocation();
 
   const dispatch = useDispatch();
@@ -23,6 +27,7 @@ function Card({ card, onDelete }) {
   }`;
 
   function handleLikeClick() {
+	// @ts-expect-error "sprint4"
     dispatch(changeLikeCardStatus(card._id, !isLiked));
   }
 
@@ -57,10 +62,5 @@ function Card({ card, onDelete }) {
     </li>
   );
 }
-
-Card.propTypes = {
-  card: cardPropTypes,
-  onDelete: PropTypes.func.isRequired,
-};
 
 export default Card;

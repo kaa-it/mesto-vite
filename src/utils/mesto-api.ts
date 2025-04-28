@@ -1,23 +1,39 @@
 import {MESTO_SERVER} from './constants';
-import {getResponse} from './utils';
+import { TCardData, TUserData } from './types';
+//import {getResponse} from './utils';
+
+export const getResponse = <T>(res: Response): Promise<T> => {
+	return res.ok ? res.json() : Promise.reject(`Ошибка: ${res.status}`);
+}
+
+type MestoApiConfig = {
+	address: string;
+	token: string;
+	groupId: string;
+}
 
 class MestoApi {
-  constructor({ address, token, groupId }) {
+  _token: string;
+  _groupId: string;
+  _address: string;
+
+
+  constructor({ address, token, groupId }: MestoApiConfig) {
     this._token = token;
     this._groupId = groupId;
     this._address = address;
   }
 
-  getCardList() {
+  getCardList(): Promise<TCardData[]> {
     return fetch(`${this._address}/${this._groupId}/cards`, {
       headers: {
         authorization: this._token,
       },
     })
-      .then(getResponse)
+      .then(getResponse<TCardData[]>)
   }
 
-  addCard({ name, link }) {
+  addCard({ name, link }: Pick<TCardData, "name" | "link">): Promise<TCardData> {
     return fetch(`${this._address}/${this._groupId}/cards/`, {
       method: 'POST',
       headers: {
@@ -29,29 +45,29 @@ class MestoApi {
         link,
       }),
     })
-      .then(getResponse)
+      .then(getResponse<TCardData>)
   }
 
-  removeCard(cardID) {
+  removeCard(cardID: string): Promise<TCardData> {
     return fetch(`${this._address}/${this._groupId}/cards/${cardID}`, {
       method: 'DELETE',
       headers: {
         authorization: this._token,
       },
     })
-      .then(getResponse) 
+      .then(getResponse<TCardData>) 
   }
 
-  getUserInfo() {
+  getUserInfo(): Promise<TUserData> {
     return fetch(`${this._address}/${this._groupId}/users/me`, {
       headers: {
         authorization: this._token,
       },
     })
-      .then(getResponse)
+      .then(getResponse<TUserData>)
   }
 
-  setUserInfo({ name, about }) {
+  setUserInfo({ name, about }: Pick<TUserData, "name" | "about">): Promise<TUserData> {
     return fetch(`${this._address}/${this._groupId}/users/me`, {
       method: 'PATCH',
       headers: {
@@ -63,10 +79,10 @@ class MestoApi {
         about,
       }),
     })
-      .then(getResponse) 
+      .then(getResponse<TUserData>) 
   }
 
-  setUserAvatar({ avatar }) {
+  setUserAvatar({ avatar }: Pick<TUserData, "avatar">): Promise<TUserData> {
     return fetch(`${this._address}/${this._groupId}/users/me/avatar`, {
       method: 'PATCH',
       headers: {
@@ -77,11 +93,11 @@ class MestoApi {
         avatar,
       }),
     })
-      .then(getResponse)
+      .then(getResponse<TUserData>)
       
   }
 
-  changeLikeCardStatus(cardID, like) {
+  changeLikeCardStatus(cardID: string, like: boolean): Promise<TCardData> {
     return fetch(`${this._address}/${this._groupId}/cards/likes/${cardID}`, {
       method: like ? 'PUT' : 'DELETE',
       headers: {
@@ -89,7 +105,7 @@ class MestoApi {
         'Content-Type': 'application/json',
       },
     })
-      .then(getResponse)
+      .then(getResponse<TCardData>)
   }
 }
 

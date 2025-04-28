@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { FormEvent, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { getIsCardSending, getCardSendError } from "../store/cards/selectors";
 import { addCard } from "../store/cards/actions";
@@ -7,26 +6,36 @@ import PopupWithForm from "./PopupWithForm";
 import useFormWithValidation from "../hooks/useFormWithValidation";
 import Input from "./ui/Input";
 
-function AddPlacePopup({ onClose }) {
+type AddPlacePopupProps = {
+	onClose: () => void;
+}
+
+function AddPlacePopup({ onClose }: AddPlacePopupProps): React.JSX.Element {
   const dispatch = useDispatch();
   const isSending = useSelector(getIsCardSending);
   const sendingError = useSelector(getCardSendError);
+
   const { values, handleChange, resetFrom, errors, isValid } =
-    useFormWithValidation();
+    useFormWithValidation({
+		name: "",
+		link: "",
+	});
 
   useEffect(() => {
     resetFrom();
   }, [resetFrom]);
 
-  const inputRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
   }, []);
 
-  function handleSubmit(evt) {
+  function handleSubmit(evt: FormEvent<HTMLFormElement>) {
     evt.preventDefault();
+	// @ts-expect-error "sprint4"
     dispatch(addCard(values)).then(() => onClose());
   }
 
@@ -46,8 +55,8 @@ function AddPlacePopup({ onClose }) {
         id="place-name"
         placeholder="Название"
         required
-        minLength="1"
-        maxLength="30"
+        minLength={1}
+        maxLength={30}
         value={values.name}
         error={errors.name}
         onChange={handleChange}
@@ -68,9 +77,5 @@ function AddPlacePopup({ onClose }) {
     </PopupWithForm>
   );
 }
-
-AddPlacePopup.propTypes = {
-  onClose: PropTypes.func.isRequired,
-};
 
 export default AddPlacePopup;
